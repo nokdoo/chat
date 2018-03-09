@@ -1,0 +1,11 @@
+.metadata/
+RemoteSystemsTempFiles/
+*.out
+.recommenders/
+*.class
+.project
+.classpath
+*.swp
+tags
+
+!c/*.out

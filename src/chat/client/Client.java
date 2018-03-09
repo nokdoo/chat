@@ -17,43 +17,66 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
-public class Client {
+public class Client implements Runnable {
 
 	private Socket socket = null;
-	public BufferedInputStream inStream = null;
-	public BufferedReader inStream2 = null;
+	private BufferedReader inStream = null;
 	private PrintWriter outStream = null;
+	Thread thread;
 	
-	public Client(Properties properties) {
-		// TODO Auto-generated constructor stub
+	private Client(Properties properties) {
+		try {
+			socket = new Socket(
+					properties.getProperty("host_address"),
+					Integer.parseInt(properties.getProperty("port")
+							));
+			inStream = new BufferedReader(
+								new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+			outStream = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+		} catch (NumberFormatException | IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
+	public void mkThread() {
+		thread = new Thread(this, socket.getInetAddress().toString());
+		thread.start();
+	}
+	
+	private void closeStream() {
+		try {
+			inStream.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	public Client(String address, int port) throws IOException  {
 		socket = new Socket(address, port);
-		System.out.println(socket);
-		inStream = new BufferedInputStream(System.in);
-		outStream = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
 	}
 
-	public static void main(String argc[]) throws NumberFormatException, UnknownHostException, IOException {
-		Client client = null;
-		if(argc.length != 2) {
-			client = new Client("localhost", 9999);
-		}else {
-			System.out.println(argc[0]);
-			client = new Client(argc[0], Integer.parseInt(argc[1]));
-			
+	public static Client mkInstance(Properties properties) {
+		return new Client(properties);
+	}
+	
+	public void sendMessage(String message) {
+		outStream.print(message+"\r\n");
+		outStream.flush();
+	}
+
+	@Override
+	public void run() {
+		//읽기만 한다.
+		while(true) {
+			String a = null;
+			try {
+				a = inStream.readLine();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println(a);
 		}
-		BufferedReader r = new BufferedReader(new InputStreamReader(client.inStream, StandardCharsets.UTF_8));
-		
-		String a = r.readLine();
-		client.outStream.print(a+"\r\n");
-		client.outStream.flush();
-		client.inStream2 = new BufferedReader(
-								new InputStreamReader(client.socket.getInputStream(), StandardCharsets.UTF_8));
-		
-		a = client.inStream2.readLine();
-		System.out.println(a);
 	}
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 
 public class Boot {
@@ -19,7 +20,6 @@ public class Boot {
 			boot.init();
 			daemon = boot;
 		}
-		
 		chatDaemon.start();
 	}
 	
@@ -29,12 +29,13 @@ public class Boot {
 	}
 	
 	private void loadProperties() throws IOException {
-		String fileName = "chat.properties";
+		String fileName = "/home/nokdoo/workspace/chat/src/chat/chat.properties";
 		InputStream is = null;
-		File home = new File(System.getProperty("user.dir"));
-		File propDir = new File(home, "src/chat");
+		File home = new File("src");
+		File propDir = new File(home.getAbsoluteFile(), "chat");
 		File propFile = new File(propDir, fileName);
-		is = new FileInputStream(propFile);
+		File propertyFile = new File(fileName);
+		is = new FileInputStream(propertyFile);
 		properties = new Properties();
 		properties.load(is);
 		is.close();

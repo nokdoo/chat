@@ -1,10 +1,6 @@
 package chat.server;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -13,8 +9,6 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 public class ThreadSocket extends Socket implements Runnable  {
 
@@ -26,7 +20,7 @@ public class ThreadSocket extends Socket implements Runnable  {
 	HashMap<String, Socket> socketHash = null;
 	private String messege = null;
 	
-	public ThreadSocket(Socket socket, HashMap<String, Socket> socketHash) {
+	protected ThreadSocket(Socket socket, HashMap<String, Socket> socketHash) {
 		// TODO Auto-generated constructor stub
 		this.socket = socket;
 		this.name = socket.getInetAddress().toString()+":"+socket.getPort();
@@ -42,7 +36,6 @@ public class ThreadSocket extends Socket implements Runnable  {
 	private void receiveMessege() {
 		try {
 			while((messege = inStream.readLine()) != null) {
-				System.err.println("Read : " + messege);
 				sendMessege(messege);
 			}
 		} catch (IOException e) {
@@ -67,11 +60,11 @@ public class ThreadSocket extends Socket implements Runnable  {
 		synchronized (socketHash) {
 			for(Map.Entry<String, Socket> entry : socketHash.entrySet()) {
 				try {
-					PrintWriter pw = new PrintWriter(
+					outStream = new PrintWriter(
 										new OutputStreamWriter(
 												entry.getValue().getOutputStream(), StandardCharsets.UTF_8));
-					pw.print(messege+"\r\n");
-					pw.flush();
+					outStream.print(messege+"\r\n");
+					outStream.flush();
 				} catch (IOException e) {
 					System.out.println(e);
 					// TODO Auto-generated catch block

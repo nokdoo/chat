@@ -22,25 +22,20 @@ public class Commander {
 		
 	}
 
-	private static Pattern pattern = null;
+	private static final Pattern pattern = Pattern.compile("\\s+|$");
 	
-	{
-		pattern = Pattern.compile("\\s+|$");
-	}
-	
-	public static String commandCheck(String messege) {
+	public static Boolean isCommand(String messege) {
 		String ltrim = messege.replaceAll("^\\s+", "");
 		if(ltrim.charAt(0) == '-') {
 			String firstWord = ltrim.substring(0, lastIndexOfFirstWord(ltrim));
 			for(Command command : Command.values()) {
 				if(command.getCommand().equals(firstWord)) {
 					executeCommand(command);
-					break;
+					return true;
 				}
 			}
-			return null;
 		}
-		return messege;
+		return false;
 	}
 	
 	private static void executeCommand(Command command) {
@@ -48,10 +43,14 @@ public class Commander {
 		case START:
 			try {
 				Chat.mkServerInstance();
+				Chat.mkClientInstance();
 			} catch (NumberFormatException | IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			break;
+		case JOIN:
+			Chat.mkClientInstance();
 			break;
 		default:
 			break;
