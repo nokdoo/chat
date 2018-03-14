@@ -1,35 +1,23 @@
 package chat.client;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.util.Properties;
 
 public class Client implements Runnable {
 
-	private Socket socket = null;
+	public Socket socket = null;
 	private BufferedReader inStream = null;
 	private PrintWriter outStream = null;
 	Thread thread;
 	
-	private Client(Properties properties) {
+	private Client(String host, int port) {
 		try {
-			socket = new Socket(
-					properties.getProperty("host_address"),
-					Integer.parseInt(properties.getProperty("port")
-							));
+			socket = new Socket(host, port);
 			inStream = new BufferedReader(
 								new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
 			outStream = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
@@ -52,12 +40,8 @@ public class Client implements Runnable {
 		}
 	}
 	
-	public Client(String address, int port) throws IOException  {
-		socket = new Socket(address, port);
-	}
-
-	public static Client mkInstance(Properties properties) {
-		return new Client(properties);
+	public static Client mkInstance(String host, int port) {
+		return new Client(host, port);
 	}
 	
 	public void sendMessage(String message) {

@@ -4,25 +4,32 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Properties;
 
 import chat.client.Client;
 import chat.server.Server;
 
 public class Chat {
 	private static Client client = null;
-	private static Server server = null;
-	private static Properties properties = null;
 	private BufferedInputStream console = null;
 	
-	public Chat(Properties properties) {
-		Chat.properties = properties;
-		openStream();
+	public static void main(String args[]) {
+		String host = Configuration.properties.getProperty("host_address");
+		int port = Integer.parseInt(Configuration.properties.getProperty("port"));
+		Chat chat = new Chat(host, port);
+		try {
+			chat.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
-	public void openStream() {
+	public Chat(String host, int port) {
+		openStream();
+	}
+
+	private void openStream() {
 		console = new BufferedInputStream(System.in);
 	}
 	
@@ -34,20 +41,24 @@ public class Chat {
 			if(Commander.isCommand(message) == true) {
 				continue;
 			}
-			sendStream(message);
+			client.sendMessage(message);
 		}
 	}
-	
+
 	public static void mkServerInstance() throws NumberFormatException, IOException {
-		server = Server.mkInstance(properties);
-		server.mkThread();
+		Server.mkInstance().mkThread();
 	}
-	public static void mkClientInstance() {
-		client = Client.mkInstance(properties);
+	
+	public static void mkClientInstance(String host, int port) {
+		client = Client.mkInstance(host, port);
 		client.mkThread();
 	}
 	
-	private void sendStream(String message) {
-		client.sendMessage(message);
+	public static void getUserList() {
+		
+	}
+
+	public static void getChatName() {
+		System.out.println(client.socket);
 	}
 }
