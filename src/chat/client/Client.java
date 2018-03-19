@@ -34,6 +34,7 @@ public class Client implements Runnable {
 	private void closeStream() {
 		try {
 			inStream.close();
+			outStream.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -48,19 +49,23 @@ public class Client implements Runnable {
 		outStream.print(message+"\r\n");
 		outStream.flush();
 	}
-
+	
 	@Override
 	public void run() {
 		//읽기만 한다.
-		while(true) {
-			String a = null;
-			try {
-				a = inStream.readLine();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		String message = null;
+		try {
+			while((message = inStream.readLine()) != null) {
+				System.out.println(message);
 			}
-			System.out.println(a);
+			System.out.println("ended\n");
+			closeStream();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
+
+	public void requestUserList() {
+	
 }

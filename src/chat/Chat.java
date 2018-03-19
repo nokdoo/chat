@@ -41,6 +41,10 @@ public class Chat {
 			if(Commander.isCommand(message) == true) {
 				continue;
 			}
+			if(client == null) {
+				System.out.println("명령어를 입력해주세요.");
+				return;
+			}
 			client.sendMessage(message);
 		}
 	}
@@ -55,10 +59,10 @@ public class Chat {
 	}
 	
 	public static void getUserList() {
-		
+		System.out.println(client.requestUserList());
 	}
-
+	
 	public static void getChatName() {
-		System.out.println(client.socket);
+		System.out.println(client.socket.toString());
 	}
 }
