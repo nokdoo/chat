@@ -1,13 +1,14 @@
-package chat;
+package chat.server;
 
+import java.io.IOException;
+import java.io.ObjectInputFilter.Status;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Commander {
 	
 	private enum Command{
-		START("/start"), JOIN("/join"), PUB("/pub"), PRIV("/priv"), OUT("/out"),
-		LIST("/list"), WHERE("/where"), MAKESERVER("/mks");
+		LIST("/list"), WHERE("/where");
 		
 		private String command;
 		
@@ -21,9 +22,7 @@ public class Commander {
 		
 	}
 
-	private static final Pattern firstSpace = Pattern.compile("\\s+|$");
-	private static final Pattern ip = Pattern.compile("\\W(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\W");
-	private static final Pattern number = Pattern.compile("\\d+");
+	private static final Pattern startWithSpace = Pattern.compile("\\s+|$");
 	
 	public static Boolean isCommand(String messege) {
 		String ltrim = messege.replaceAll("^\\s+", "");
@@ -40,10 +39,18 @@ public class Commander {
 	}
 	
 	private static void executeCommand(Command command, String str) {
+		switch(command) {
+		case LIST:
+			break;
+		case WHERE:
+			break;
+		default:
+			break;
+		}
 	}
 	
 	private static int lastIndexOfFirstWord(String words) {
-		Matcher matcher = firstSpace.matcher(words);
+		Matcher matcher = startWithSpace.matcher(words);
 		if(matcher.find()) {
 			return matcher.start();
 		}

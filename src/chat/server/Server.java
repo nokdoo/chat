@@ -11,23 +11,29 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import chat.Configuration;
-
-public class Server implements Runnable {
+public class Server{
 
 	private HashMap<String, Socket> socketHash = null;
 	private ServerSocket serverSocket = null;
 	private ServerThread serverThread = null;
+	private Thread thread;
 	
 	private Server() {
 		int port = Integer.parseInt(Configuration.properties.getProperty("port"));
 		try {
 			serverSocket = new ServerSocket(port);
 		} catch (NumberFormatException | IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		socketHash = new HashMap<String, Socket>();
+	}
+	
+	public static void main(String args[]) {
+		try {
+			Server.mkInstance().mkServerThread();
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static Server mkInstance() {
@@ -35,29 +41,25 @@ public class Server implements Runnable {
 		return server;
 	}
 
-	public void mkThread() {
-		Thread thread = new Thread(this, "ServerThread");
+	public void mkServerThread() {
+		thread = new Thread(new Runnable() {
+			public void run() {
+				while(true) {
+					try {
+						serverThread = new ServerThread(serverSocket.accept(), socketHash);
+					} catch (IOException e) {
+						System.out.println(e);
+						e.printStackTrace();
+					}
+					String inetAddress = serverThread.socket.getInetAddress().toString();
+					Integer port = serverThread.socket.getPort();
+					socketHash.put(inetAddress+":"+port, serverThread.socket);
+					serverThread.mkThread();
+				}
+			}
+		}, "ServerThread");
 		thread.start();
 	}
-
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		while(true) {
-			try {
-				serverThread = new ServerThread(serverSocket.accept(), socketHash);
-			} catch (IOException e) {
-				System.out.println(e);
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			String inetAddress = serverThread.socket.getInetAddress().toString();
-			Integer port = serverThread.socket.getPort();
-			socketHash.put(inetAddress+":"+port, serverThread.socket);
-			serverThread.mkThread();
-		}
-	}
-	
 	
 	private class ServerThread extends Socket implements Runnable  {
 
@@ -69,15 +71,14 @@ public class Server implements Runnable {
 		HashMap<String, Socket> socketHash = null;
 		private String messege = null;
 		
-		protected ServerThread(Socket socket, HashMap<String, Socket> socketHash) {
-			// TODO Auto-generated constructor stub
+		private ServerThread(Socket socket, HashMap<String, Socket> socketHash) {
 			this.socket = socket;
 			this.name = socket.getInetAddress().toString()+":"+socket.getPort();
 			this.socketHash = socketHash;
 			openInStream();
 		}
 		
-		public void mkThread() {
+		private void mkThread() {
 			thread = new Thread(this, name);
 			thread.start();
 		}
@@ -88,7 +89,6 @@ public class Server implements Runnable {
 					sendMessege(messege);
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			System.out.println("socket ended : " + socket);
@@ -100,7 +100,6 @@ public class Server implements Runnable {
 				this.inStream = new BufferedReader(
 						new InputStreamReader(this.socket.getInputStream(), StandardCharsets.UTF_8));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -116,7 +115,6 @@ public class Server implements Runnable {
 						outStream.flush();
 					} catch (IOException e) {
 						System.out.println(e);
-						// TODO Auto-generated catch block
 					e.printStackTrace();
 					}
 				}
@@ -129,4 +127,5 @@ public class Server implements Runnable {
 			receiveMessege();
 		}
 	}
+	
 }

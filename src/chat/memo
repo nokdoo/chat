@@ -1,3 +1,1 @@
-client - requestUserList
-사용자가 서버에 현재 사용자 목록을 요청하자.
-RMI이면 될 듯.
+서버, 클라이언트 분할하기

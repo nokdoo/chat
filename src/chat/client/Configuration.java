@@ -1,4 +1,4 @@
-package chat;
+package chat.client;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,7 +12,7 @@ public class Configuration {
 	public static Properties properties = null;
 	
 	static {
-		String fileName = "/home/nokdoo/workspace/chat/src/chat/chat.properties";
+		String fileName = "/home/nokdoo/workspace/chat/src/chat/client/properties";
 		File propertyFile = new File(fileName);
 		try(InputStream is  = new FileInputStream(propertyFile)){
 			properties = new Properties();

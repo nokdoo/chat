@@ -1,0 +1,4 @@
+# port = 6667
+# host_address = 185.30.166.37
+port = 9999
+host_address = localhost
